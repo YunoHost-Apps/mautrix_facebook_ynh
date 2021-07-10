@@ -11,7 +11,7 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 ## Overview
 A puppeting bridge between Matrix and Facebook packaged as a YunoHost service. Messages, notifications (and sometimes media) are bridged between a Facebook user and a Matrix user. Currently the Matrix user can NOT invite other Matrix user in a bridged Facebook room, so only someone with a Facebook account can participate to Facebook group conversations. The ["Mautrix-Facebook"](https://docs.mau.fi/bridges/python/facebook/index.html) bridge consists in a Synapse App Service and relies on postgresql (mysql also possible). Therefore, [Synapse for YunoHost](https://github.com/YunoHost-Apps/synapse_ynh) should be installed beforehand.
 
-**Shipped version:** 0.2.0
+**Shipped version:** 0.3.0
 
 ## Screenshots
 
@@ -32,7 +32,7 @@ A puppeting bridge between Matrix and Facebook packaged as a YunoHost service. M
 * If you have 2FA enabled, the bot will ask you to send the 2FA token.
 * By defaults, only conversations with very recent messages will be bridged
 * Accept invitations to the bridged chat rooms
-* Send ``!sg help`` to the bot in this new Mautrix-Facebook bot administration room to know how to control the bot.
+* Send ``!fb help`` to the bot in this new Mautrix-Facebook bot administration room to know how to control the bot.
 See also [upstream wiki Authentication page](https://docs.mau.fi/bridges/python/facebook/authentication.html)
 
 ### Double puppeting
@@ -95,7 +95,7 @@ https://docs.mau.fi/bridges/python/facebook/index.html
 ## Links
 
  * Report a bug: https://github.com/YunoHost-Apps/mautrix_facebook_ynh/issues
- * App website: https://github.com/YunoHost-Apps/mautrix-whatsapp_ynh
+ * App website: https://github.com/YunoHost-Apps/mautrix_facebook_ynh
  * Upstream app documentation: https://docs.mau.fi/bridges/python/facebook/index.html
  * Upstream app repository: https://github.com/tulir/mautrix-facebook
  * YunoHost website: https://yunohost.org/

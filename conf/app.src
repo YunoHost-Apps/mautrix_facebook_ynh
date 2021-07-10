@@ -1,5 +1,5 @@
-SOURCE_URL=https://github.com/tulir/mautrix-facebook/tarball/7b2246099d3d6ac52061f82315460415eb22219b
-SOURCE_SUM=fd9d4f2b2feec390fb35b56f3a5e4a26234f9ed5029eb3950bea4b7dc55bef49
+SOURCE_URL=https://github.com/tulir/mautrix-facebook/archive/v0.3.0.tar.gz
+SOURCE_SUM=992e491a3e34bd42ddfba0b3aef7869a7a7c03171560783ec23a692d1f0d79a1
 SOURCE_SUM_PRG=sha256sum
 SOURCE_FORMAT=tar.gz
 SOURCE_IN_SUBDIR=true
