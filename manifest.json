@@ -6,7 +6,7 @@
         "en": "Facebook puppeting bridge for Matrix/Synapse.",
         "fr": "Passerelle Facebook pour Matrix/Synapse."
     },
-    "version": "0.3.3~ynh1",
+    "version": "0.4.1~ynh1",
     "url": "https://github.com/mautrix/facebook",
     "upstream": {
         "license": "AGPL-3.0-or-later",
