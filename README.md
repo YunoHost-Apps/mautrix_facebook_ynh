@@ -6,6 +6,7 @@ It shall NOT be edited by hand.
 # Matrix-Facebook bridge for YunoHost
 
 [![Integration level](https://dash.yunohost.org/integration/mautrix_facebook.svg)](https://dash.yunohost.org/appci/app/mautrix_facebook) ![Working status](https://ci-apps.yunohost.org/ci/badges/mautrix_facebook.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/mautrix_facebook.maintain.svg)
+
 [![Install Matrix-Facebook bridge with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=mautrix_facebook)
 
 *[Lire ce readme en français.](./README_fr.md)*
