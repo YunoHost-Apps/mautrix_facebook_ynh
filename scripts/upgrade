@@ -12,45 +12,25 @@ source /usr/share/yunohost/helpers
 #=================================================
 # LOAD SETTINGS
 #=================================================
-ynh_script_progression --message="Loading installation settings..." --weight=1
+#REMOVEME? ynh_script_progression --message="Loading installation settings..." --weight=1
 
-app=$YNH_APP_INSTANCE_NAME
+#REMOVEME? app=$YNH_APP_INSTANCE_NAME
 
-botname=$(ynh_app_setting_get --app=$app --key=botname)
-encryption=$(ynh_app_setting_get --app=$app --key=encryption)
-botadmin=$(ynh_app_setting_get --app=$app --key=botadmin)
-botusers=$(ynh_app_setting_get --app=$app --key=botusers)
-domain=$(ynh_app_setting_get --app=$app --key=domain)
-final_path=$(ynh_app_setting_get --app=$app --key=final_path)
-db_name=$(ynh_app_setting_get --app=$app --key=db_name)
-db_user=$db_name
-db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
-port=$(ynh_app_setting_get --app=$app --key=port)
-synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
-server_name=$(ynh_app_setting_get --app=$app --key=server_name)
+#REMOVEME? botname=$(ynh_app_setting_get --app=$app --key=botname)
+#REMOVEME? encryption=$(ynh_app_setting_get --app=$app --key=encryption)
+#REMOVEME? botadmin=$(ynh_app_setting_get --app=$app --key=botadmin)
+#REMOVEME? botusers=$(ynh_app_setting_get --app=$app --key=botusers)
+#REMOVEME? domain=$(ynh_app_setting_get --app=$app --key=domain)
+#REMOVEME? #REMOVEME? install_dir=$(ynh_app_setting_get --app=$app --key=install_dir)
+#REMOVEME? db_name=$(ynh_app_setting_get --app=$app --key=db_name)
+#REMOVEME? db_user=$db_name
+#REMOVEME? db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
+#REMOVEME? port=$(ynh_app_setting_get --app=$app --key=port)
+#REMOVEME? synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
+#REMOVEME? server_name=$(ynh_app_setting_get --app=$app --key=server_name)
+synapse_registration_path="/etc/matrix-$synapse_instance/app-service"
 synapse_registration_path=$(ynh_app_setting_get --app=$app --key=synapse_registration_path)
 synapse_db_name="matrix_$synapse_instance"
-
-#=================================================
-# CHECK VERSION
-#=================================================
-ynh_script_progression --message="Checking version..." --weight=1
-
-upgrade_type=$(ynh_check_app_version_changed)
-
-#=================================================
-# BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
-#=================================================
-ynh_script_progression --message="Backing up the app before upgrading (may take a while)..." --weight=5
-
-# Backup the current version of the app
-ynh_backup_before_upgrade
-ynh_clean_setup () {
-	# Restore it if the upgrade fails
-	ynh_restore_upgradebackup
-}
-# Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
 
 #=================================================
 # STANDARD UPGRADE STEPS
@@ -59,121 +39,76 @@ ynh_abort_if_errors
 #=================================================
 ynh_script_progression --message="Stopping a systemd service..." --weight=1
 
-ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app/$app.log"
+ynh_systemd_action --service_name="$app" --action="stop" --log_path="/var/log/$app/$app.log"
 
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
-ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
-
-#=================================================
-# CREATE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
-
-# Create a dedicated user (if not existing)
-ynh_system_user_create --username=$app --home_dir="$final_path"
+# ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
+ynh_script_progression --message="Upgrading source files..." --weight=1
 
-if [ "$upgrade_type" == "UPGRADE_APP" ]
-then
-	ynh_script_progression --message="Upgrading source files..." --weight=1
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source --dest_dir="$install_dir/src" --full_replace=1
 
-	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$final_path/src"
-fi
+chmod -R o-rwx "$install_dir"
+chown -R "$app:$app" "$install_dir"
 
-chmod 750 "$final_path"
-chmod -R o-rwx "$final_path"
-chown -R $app:$app "$final_path"
-
-#=================================================
-# UPGRADE DEPENDENCIES
-#=================================================
-ynh_script_progression --message="Upgrading dependencies..." --weight=1
-
-ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
-
-#=================================================
-# SPECIFIC UPGRADE
 #=================================================
 # UPDATE A CONFIG FILE
 #=================================================
 ynh_script_progression --message="Updating a configuration file..." --weight=2
 
-ynh_add_config --template="../conf/config.yaml" --destination="$final_path/config.yaml"
+ynh_add_config --template="config.yaml" --destination="$install_dir/config.yaml"
 
-chmod 400 "$final_path/config.yaml"
-chown $app:$app "$final_path/config.yaml"
+chmod 400 "$install_dir/config.yaml"
+chown "$app:$app" "$install_dir/config.yaml"
 
 #=================================================
 # UPGRADE MAUTRIX-BRIDGE PYTHON MODULE
 #=================================================
 ynh_script_progression --message="Upgrading Mautrix-Bridge Python Module..." --weight=2
 
-python3 -m venv $final_path
-export HOME=$final_path
-$final_path/bin/pip3 install --upgrade pip setuptools wheel
-$final_path/bin/pip3 install --upgrade $final_path/src/mautrix-facebook.tar.gz
+_mautrix_facebook_build_venv
 
 #=================================================
 # REGISTER SYNAPSE APP-SERVICE
 #=================================================
 ynh_script_progression --message="Registering Synapse app-service" --weight=1
 
-$final_path/bin/python3 -m mautrix_facebook -g -c $final_path/config.yaml -r $synapse_registration_path/$app.yaml
-/opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh || ynh_die "Synapse can't restart with the appservice configuration"
-
-# Set permissions on app files
-chown -R $app:$app "$final_path"
-ynh_store_file_checksum --file="$synapse_registration_path/$app.yaml"
-ynh_store_file_checksum --file="$final_path/config.yaml"
+_mautrix_facebook_register_synapse
 
 #=================================================
-# SETUP SYSTEMD
+# REAPPLY SYSTEM CONFIGURATIONS
 #=================================================
-ynh_script_progression --message="Upgrading systemd configuration..." --weight=1
+ynh_script_progression --message="Upgrading system configurations related to $app..." --weight=1
 
 # Create a dedicated systemd config
 ynh_add_systemd_config
-
-#=================================================
-# GENERIC FINALIZATION
-#=================================================
-# SETUP LOGROTATE
-#=================================================
-ynh_script_progression --message="Upgrading logrotate configuration..." --weight=1
+yunohost service add "$app" --description="$app daemon for bridging FB and Matrix messages" --log="/var/log/$app/$app.log"
 
 # Use logrotate to manage application logfile(s)
 ynh_use_logrotate --logfile "/var/log/$app/$app.log"
-chown -R $app:$app /var/log/$app
-
-#=================================================
-# INTEGRATE SERVICE IN YUNOHOST
-#=================================================
-ynh_script_progression --message="Integrating service in YunoHost..." --weight=1
-
-yunohost service add $app --description="$app daemon for bridging FB and Matrix messages" --log="/var/log/$app/$app.log"
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..." --weight=1
+ynh_script_progression --message="Starting $app's systemd service..." --weight=1
 
 # Start a systemd service
-ynh_systemd_action --service_name=$app --action="start"
+ynh_systemd_action --service_name="$app" --action="start"
 # Wait until the synapse user is created
 sleep 30
 #	# (Note that, by default, non-admins might not have your homeserver's permission to create communities.)
 #	if [ "$bot_is_synapse_admin" = true ]
 #	then
-	ynh_psql_execute_as_root --database=$synapse_db_name --sql="UPDATE users SET admin = 1 WHERE name = ""$botname"";"
+	ynh_psql_execute_as_root --database=$synapse_db_name --sql="UPDATE users SET admin = 1 WHERE name = \"$botname\";"
 #	#yunohost app action run $synapse_instance set_admin_user -a username=$facebookbot
 #	fi
-ynh_systemd_action --service_name=$app --action="restart"
+ynh_systemd_action --service_name="$app" --action="restart"
 
 #=================================================
 # END OF SCRIPT

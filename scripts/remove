@@ -12,44 +12,31 @@ source /usr/share/yunohost/helpers
 #=================================================
 # LOAD SETTINGS
 #=================================================
-ynh_script_progression --message="Loading installation settings..." --weight=1
+#REMOVEME? ynh_script_progression --message="Loading installation settings..." --weight=1
 
-app=$YNH_APP_INSTANCE_NAME
+#REMOVEME? app=$YNH_APP_INSTANCE_NAME
 
-botname=$(ynh_app_setting_get --app=$app --key=botname)
-synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
-server_name=$(ynh_app_setting_get --app=$app --key=server_name)
-db_name=$(ynh_app_setting_get --app=$app --key=db_name)
-db_user=$db_name
-final_path=$(ynh_app_setting_get --app=$app --key=final_path)
-synapse_registration_path=$(ynh_app_setting_get --app=$app --key=synapse_registration_path)
+#REMOVEME? botname=$(ynh_app_setting_get --app=$app --key=botname)
+#REMOVEME? synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
+#REMOVEME? server_name=$(ynh_app_setting_get --app=$app --key=server_name)
+#REMOVEME? db_name=$(ynh_app_setting_get --app=$app --key=db_name)
+#REMOVEME? db_user=$db_name
+#REMOVEME? #REMOVEME? install_dir=$(ynh_app_setting_get --app=$app --key=install_dir)
+#REMOVEME? synapse_registration_path=$(ynh_app_setting_get --app=$app --key=synapse_registration_path)
 synapse_db_name="matrix_$synapse_instance"
 
 #=================================================
-# STANDARD REMOVE
+# REMOVE SYSTEM CONFIGURATIONS
 #=================================================
-# REMOVE SERVICE INTEGRATION IN YUNOHOST
-#=================================================
+ynh_script_progression --message="Removing system configurations related to $app..." --weight=1
 
 # Remove the service from the list of services known by YunoHost (added from `yunohost service add`)
-if ynh_exec_warn_less yunohost service status $app >/dev/null
-then
-	ynh_script_progression --message="Removing $app service integration..." --weight=3
-	yunohost service remove $app
+if ynh_exec_warn_less yunohost service status "$app" >/dev/null; then
+    yunohost service remove "$app"
 fi
-
-#=================================================
-# STOP AND REMOVE SERVICE
-#=================================================
-ynh_script_progression --message="Stopping and removing the systemd service..." --weight=1
 
 # Remove the dedicated systemd config
 ynh_remove_systemd_config
-
-#=================================================
-# REMOVE LOGROTATE CONFIGURATION
-#=================================================
-ynh_script_progression --message="Removing logrotate configuration..." --weight=1
 
 # Remove the app-specific logrotate config
 ynh_remove_logrotate
@@ -57,30 +44,13 @@ ynh_remove_logrotate
 #=================================================
 # REMOVE THE POSTGRESQL DATABASE
 #=================================================
-ynh_script_progression --message="Removing the PostgreSQL database..." --weight=4
+ynh_script_progression --message="Removing the PostgreSQL configuration..." --weight=4
 
 # Remove a database if it exists, along with the associated user
-ynh_psql_remove_db --db_user=$db_user --db_name=$db_name
-ynh_psql_execute_as_root --database=$synapse_db_name --sql="DROP OWNED BY ""$app"";"
-ynh_psql_execute_as_root --database=$synapse_db_name --sql="DROP USER ""$app"";"
-ynh_psql_execute_as_root --database=$synapse_db_name --sql="DROP OWNED BY ""$botname"";"
-ynh_psql_execute_as_root --database=$synapse_db_name --sql="DROP USER ""$botname"";"
-
-#=================================================
-# REMOVE APP MAIN DIR
-#=================================================
-ynh_script_progression --message="Removing app main directory..." --weight=1
-
-# Remove the app directory securely
-ynh_secure_remove --file="$final_path"
-
-#=================================================
-# REMOVE DEPENDENCIES
-#=================================================
-ynh_script_progression --message="Removing dependencies..." --weight=8
-
-# Remove metapackage and its dependencies
-ynh_remove_app_dependencies
+ynh_psql_execute_as_root --database="$synapse_db_name" --sql="DROP OWNED BY ""$app"";"
+ynh_psql_execute_as_root --database="$synapse_db_name" --sql="DROP USER ""$app"";"
+ynh_psql_execute_as_root --database="$synapse_db_name" --sql="DROP OWNED BY ""$botname"";"
+ynh_psql_execute_as_root --database="$synapse_db_name" --sql="DROP USER ""$botname"";"
 
 #=================================================
 # SPECIFIC REMOVE
@@ -95,16 +65,6 @@ ynh_secure_remove --file="$synapse_registration_path/$app.yaml"
 
 # Remove the log files
 ynh_secure_remove --file="/var/log/$app"
-
-#=================================================
-# GENERIC FINALIZATION
-#=================================================
-# REMOVE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Removing the dedicated system user..." --weight=5
-
-# Delete a system user
-ynh_system_user_delete --username=$app
 
 #=================================================
 # END OF SCRIPT

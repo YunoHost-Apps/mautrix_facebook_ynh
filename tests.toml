@@ -1,0 +1,15 @@
+#:schema https://raw.githubusercontent.com/YunoHost/apps/master/schemas/tests.v1.schema.json
+test_format = 1.0
+
+[default]
+
+    preinstall = """
+        sudo yunohost tools update apps
+        sudo yunohost app install --force https://github.com/YunoHost-Apps/synapse_ynh/ \
+            -a "domain=$domain&server_name=$server_name&is_free_registration=$is_free_registration&jitsi_server=$jitsi_server"
+    """
+
+    args.botadmin = "@johndoe:synapsedomain.tld"
+    args.botusers = "synapsedomain.tld"
+
+    test_upgrade_from.95aae535122b98bd94c410e040891b81b15bd654.name = "0.3.3~ynh1"

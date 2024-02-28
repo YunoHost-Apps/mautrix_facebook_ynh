@@ -1,7 +1,0 @@
-SOURCE_URL=https://github.com/mautrix/facebook/archive/v0.5.1.tar.gz
-SOURCE_SUM=28fa1367c1108554e155b9b061adb6023fbde949b836db640bd74f5e88bf6249
-SOURCE_SUM_PRG=sha256sum
-SOURCE_FORMAT=tar.gz
-SOURCE_IN_SUBDIR=true
-SOURCE_FILENAME=mautrix-facebook.tar.gz
-SOURCE_EXTRACT=false
