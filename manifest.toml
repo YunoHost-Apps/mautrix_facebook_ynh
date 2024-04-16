@@ -7,7 +7,7 @@ name = "Matrix-Facebook bridge"
 description.en = "Facebook puppeting bridge for Matrix/Synapse."
 description.fr = "Passerelle Facebook pour Matrix/Synapse."
 
-version = "0.5.1~ynh1"
+version = "0.5.1~ynh2"
 
 maintainers = ["Gredin67"]
 
