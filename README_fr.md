@@ -25,7 +25,7 @@ La passerelle ["Mautrix-Facebook"](https://docs.mau.fi/bridges/python/facebook/i
 **Version incluse :** 0.5.1~ynh1
 ## :red_circle: Anti-fonctionnalités
 
-- **Application non maintenue**: Ce logiciel n'est plus maintenu. Attendez-vous à ce qu'il ne fonctionne plus avec le temps, et que l'on découvre des failles de sécurité qui ne seront pas corrigées, etc.
+- **Application non maintenue **: Ce logiciel n'est plus maintenu. Attendez-vous à ce qu'il ne fonctionne plus avec le temps, et que l'on découvre des failles de sécurité qui ne seront pas corrigées, etc.
 
 ## Documentations et ressources
 
