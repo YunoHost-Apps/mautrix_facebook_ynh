@@ -20,7 +20,7 @@ A puppeting bridge between Matrix and Facebook packaged as a YunoHost service. M
 
 
 **Versión proporcionada:** 0.5.1~ynh2
-## :red_circle: Caraterísticas cuestionables
+## :red_circle: Debes considerar
 
 - **Upstream not maintained**: This software is not maintained anymore. Expect it to break down over time, be exposed to unfixed security breaches, etc.
 

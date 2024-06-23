@@ -3,7 +3,7 @@
 请勿手动编辑。
 -->
 
-# YunoHost 的 Matrix-Facebook bridge
+# YunoHost 上的 Matrix-Facebook bridge
 
 [![集成程度](https://dash.yunohost.org/integration/mautrix_facebook.svg)](https://dash.yunohost.org/appci/app/mautrix_facebook) ![工作状态](https://ci-apps.yunohost.org/ci/badges/mautrix_facebook.status.svg) ![维护状态](https://ci-apps.yunohost.org/ci/badges/mautrix_facebook.maintain.svg)
 
